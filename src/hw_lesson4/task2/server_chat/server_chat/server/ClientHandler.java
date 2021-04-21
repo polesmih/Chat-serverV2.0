@@ -7,6 +7,8 @@ import java.io.IOException;
 import java.net.Socket;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 
 public class ClientHandler {
@@ -28,8 +30,9 @@ public class ClientHandler {
             throw new ChatServerException("Something went wrong during client establishing.", e);
         }
 
-        new Thread(() -> {
-
+        // new Thread(() -> {
+        ExecutorService executorService = Executors.newFixedThreadPool(100);
+        executorService.execute(() -> {
             try {
                 socket.setSoTimeout(120000);
             } catch (SocketException e) {
@@ -41,10 +44,14 @@ public class ClientHandler {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-
             listen();
-        })
-                .start();
+
+        });
+
+        executorService.shutdown();
+
+// })
+// .start();
     }
 
 
